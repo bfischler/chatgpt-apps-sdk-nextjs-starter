@@ -1,6 +1,7 @@
 import { baseURL } from "@/baseUrl";
 import { createMcpHandler } from "mcp-handler";
 import { z } from "zod";
+import { FIND_CONTACTS_DESCRIPTION } from "./find-contacts";
 
 const getAppsSdkCompatibleHtml = async (baseUrl: string, path: string) => {
   const result = await fetch(`${baseUrl}${path}`);
@@ -32,14 +33,14 @@ const handler = createMcpHandler(async (server) => {
   const html = await getAppsSdkCompatibleHtml(baseURL, "/");
 
   const contentWidget: ContentWidget = {
-    id: "show_content",
-    title: "Show Content",
+    id: "finding_contacts",
+    title: "Find Contacts",
     templateUri: "ui://widget/content-template.html",
-    invoking: "Loading content...",
-    invoked: "Content loaded",
+    invoking: "Finding contacts...",
+    invoked: "Contacts found",
     html: html,
-    description: "Displays the homepage content",
-    widgetDomain: "https://nextjs.org/docs",
+    description: "Displays a list of contacts from the provided company",
+    widgetDomain: "https://app.clay.com",
   };
   server.registerResource(
     "content-widget",
@@ -73,23 +74,26 @@ const handler = createMcpHandler(async (server) => {
     contentWidget.id,
     {
       title: contentWidget.title,
-      description:
-        "Fetch and display the homepage content with the name of the user",
+      description: FIND_CONTACTS_DESCRIPTION,
       inputSchema: {
-        name: z.string().describe("The name of the user to display on the homepage"),
+        domain: z
+          .string()
+          .describe(
+            "The company domain or linkedin url to search for contacts"
+          ),
       },
       _meta: widgetMeta(contentWidget),
     },
-    async ({ name }) => {
+    async ({ domain }) => {
       return {
         content: [
           {
             type: "text",
-            text: name,
+            text: domain,
           },
         ],
         structuredContent: {
-          name: name,
+          domain: domain,
           timestamp: new Date().toISOString(),
         },
         _meta: widgetMeta(contentWidget),

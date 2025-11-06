@@ -1,7 +1,5 @@
 "use client";
 
-import Image from "next/image";
-import Link from "next/link";
 import {
   useWidgetProps,
   useMaxHeight,
@@ -9,22 +7,38 @@ import {
   useRequestDisplayMode,
   useIsChatGptApp,
 } from "./hooks";
+import { NoChatGPTWarning } from "@/components/NoChatGPTWarning";
+import PeopleTable from "@/components/PeopleTable/PeopleTable";
+import { useFindPeople } from "./hooks/useFindPeople";
+import { useEffect, useState } from "react";
+import { PeopleSourceInputs } from "@/components/ConfigurationSidebar/types";
+import clsx from "clsx";
+import ConfigurationSidebar from "@/components/ConfigurationSidebar/ConfigurationSidebar";
 
 export default function Home() {
   const toolOutput = useWidgetProps<{
-    name?: string;
-    result?: { structuredContent?: { name?: string } };
+    domain?: string;
+    result?: { structuredContent?: { domain?: string } };
   }>();
+  const domain =
+    toolOutput?.result?.structuredContent?.domain || toolOutput?.domain;
   const maxHeight = useMaxHeight() ?? undefined;
   const displayMode = useDisplayMode();
   const requestDisplayMode = useRequestDisplayMode();
   const isChatGptApp = useIsChatGptApp();
 
-  const name = toolOutput?.result?.structuredContent?.name || toolOutput?.name;
+  const { data, loading } = useFindPeople();
+  const [dataPoints, setDataPoints] = useState<string[]>([]);
+
+  const filters = domain
+    ? { company_identifier: [domain] }
+    : !isChatGptApp
+      ? { company_identifier: ["openai.com"] }
+      : undefined;
 
   return (
     <div
-      className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20"
+      className={clsx("font-sans relative")}
       style={{
         maxHeight,
         height: displayMode === "fullscreen" ? maxHeight : undefined,
@@ -33,7 +47,7 @@ export default function Home() {
       {displayMode !== "fullscreen" && (
         <button
           aria-label="Enter fullscreen"
-          className="fixed top-4 right-4 z-50 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-lg ring-1 ring-slate-900/10 dark:ring-white/10 p-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
+          className="absolute top-2 right-2 z-50 rounded-full bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-300 shadow-lg ring-1 ring-slate-900/10 dark:ring-white/10 p-2.5 hover:bg-slate-50 dark:hover:bg-slate-700 transition-colors cursor-pointer"
           onClick={() => requestDisplayMode("fullscreen")}
         >
           <svg
@@ -52,43 +66,28 @@ export default function Home() {
           </svg>
         </button>
       )}
-      <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
-        {!isChatGptApp && (
-          <div className="bg-blue-50 dark:bg-blue-950 border border-blue-200 dark:border-blue-800 rounded-lg px-4 py-3 w-full">
-            <div className="flex items-center gap-3">
-              <svg
-                className="w-5 h-5 text-blue-600 dark:text-blue-400 flex-shrink-0"
-                fill="currentColor"
-                viewBox="0 0 20 20"
-                aria-hidden="true"
-              >
-                <path
-                  fillRule="evenodd"
-                  d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a.75.75 0 000 1.5h.253a.25.25 0 01.244.304l-.459 2.066A1.75 1.75 0 0010.747 15H11a.75.75 0 000-1.5h-.253a.25.25 0 01-.244-.304l.459-2.066A1.75 1.75 0 009.253 9H9z"
-                  clipRule="evenodd"
-                />
-              </svg>
-              <div className="flex-1 min-w-0">
-                <p className="text-sm text-blue-900 dark:text-blue-100 font-medium">
-                  This app relies on data from a ChatGPT session.
-                </p>
-                <p className="text-sm text-blue-900 dark:text-blue-100 font-medium">
-                  No{" "}
-                  <a
-                    href="https://developers.openai.com/apps-sdk/reference"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="underline hover:no-underline font-mono bg-blue-100 dark:bg-blue-900 px-1 py-0.5 rounded"
-                  >
-                    window.openai
-                  </a>{" "}
-                  property detected
-                </p>
-              </div>
-            </div>
-          </div>
-        )}
-        <Image
+      <main className="flex flex-col gap-2">
+        {!isChatGptApp && <NoChatGPTWarning />}
+        <div className={clsx("flex", displayMode === "inline" ? "w-full" : "")}>
+          {displayMode === "fullscreen" && !!filters && (
+            <ConfigurationSidebar
+              filters={filters}
+              dataPoints={dataPoints}
+              onChangeDataPoints={setDataPoints}
+            />
+          )}
+          <PeopleTable
+            data={data}
+            additionalDataPoints={dataPoints}
+            loading={loading || !filters}
+            className={clsx(
+              displayMode === "inline" &&
+                "rounded-lg max-h-[500px] overflow-auto w-full",
+              displayMode === "fullscreen" && "rounded-none w-full"
+            )}
+          />
+        </div>
+        {/* <Image
           className="dark:invert"
           src="/next.svg"
           alt="Next.js logo"
@@ -122,7 +121,7 @@ export default function Home() {
           >
             Deploy on Vercel
           </a>
-        </div>
+        </div> */}
       </main>
     </div>
   );
