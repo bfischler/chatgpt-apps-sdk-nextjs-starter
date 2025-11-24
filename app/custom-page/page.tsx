@@ -1,8 +1,17 @@
 "use client";
 
 import Link from "next/link";
+import { useWidgetState } from "../hooks";
 
 export default function HomePage() {
+  const [widgetState, setWidgetState] = useWidgetState<{
+    displayName?: string;
+  }>();
+
+  const handleButton = () => {
+    setWidgetState((prev) => ({ ...prev, displayName: "Second page state" }));
+  };
+
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
@@ -17,6 +26,15 @@ export default function HomePage() {
         >
           Go to the main page
         </Link>
+        <button
+          className="text-blue-500 underline cursor-pointer"
+          onClick={() => {
+            handleButton();
+          }}
+        >
+          Update display name below with widgetState
+        </button>
+        <p>Display Name: {widgetState?.displayName ?? "<unset>"}</p>
       </main>
     </div>
   );

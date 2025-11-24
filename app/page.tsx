@@ -28,7 +28,7 @@ export default function Home() {
   }>();
 
   const handleButton = () => {
-    setWidgetState((prev) => ({ ...prev, displayName: "Brett Fischler" }));
+    setWidgetState((prev) => ({ ...prev, displayName: "First page state" }));
   };
 
   return (
@@ -134,7 +134,7 @@ export default function Home() {
         </div>
 
         <button
-          className="bg-blue-500 underline"
+          className="text-blue-500 underline cursor-pointer"
           onClick={() => {
             handleButton();
           }}
