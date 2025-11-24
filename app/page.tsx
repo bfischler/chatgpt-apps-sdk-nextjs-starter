@@ -8,6 +8,7 @@ import {
   useDisplayMode,
   useRequestDisplayMode,
   useIsChatGptApp,
+  useWidgetState,
 } from "./hooks";
 
 export default function Home() {
@@ -21,6 +22,14 @@ export default function Home() {
   const isChatGptApp = useIsChatGptApp();
 
   const name = toolOutput?.result?.structuredContent?.name || toolOutput?.name;
+
+  const [widgetState, setWidgetState] = useWidgetState<{
+    displayName?: string;
+  }>();
+
+  const handleButton = () => {
+    setWidgetState((prev) => ({ ...prev, displayName: "Brett Fischler" }));
+  };
 
   return (
     <div
@@ -123,6 +132,16 @@ export default function Home() {
             Deploy on Vercel
           </a>
         </div>
+
+        <button
+          className="bg-blue-500 underline"
+          onClick={() => {
+            handleButton();
+          }}
+        >
+          Update display name below with widgetState
+        </button>
+        <p>Display Name: {widgetState?.displayName ?? "<unset>"}</p>
       </main>
     </div>
   );
