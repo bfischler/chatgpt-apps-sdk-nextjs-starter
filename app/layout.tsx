@@ -68,7 +68,8 @@ function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
 
             // Normalize URL to same-origin relative path for pushState/replaceState
             // This is needed because in ChatGPT iframes, the document origin differs from the app origin
-            const normalizeHistoryUrl = (url: string | URL | null | undefined) => {
+            // @ts-ignore - This code is stringified and run in browser, not compiled by TS
+            const normalizeHistoryUrl = (url) => {
               if (!url) return url;
               try {
                 const u = new URL(url, window.location.href);
@@ -81,19 +82,20 @@ function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
 
             // Sanitize state object to remove any "url" or "as" fields that might contain cross-origin URLs
             // Next.js stores these in state and browsers may validate them
-            const sanitizeState = (s: unknown) => {
+            // @ts-ignore - This code is stringified and run in browser, not compiled by TS
+            const sanitizeState = (s) => {
               if (!s || typeof s !== 'object') return s;
-              const sanitized = { ...s } as Record<string, unknown>;
-              if ('url' in sanitized) sanitized.url = normalizeHistoryUrl(sanitized.url as string);
-              if ('as' in sanitized) sanitized.as = normalizeHistoryUrl(sanitized.as as string);
+              const sanitized = { ...s };
+              if ('url' in sanitized) sanitized.url = normalizeHistoryUrl(sanitized.url);
+              if ('as' in sanitized) sanitized.as = normalizeHistoryUrl(sanitized.as);
               return sanitized;
             };
 
             const originalReplaceState = history.replaceState;
-            history.replaceState = function(s, unused, url) {
-              const href = normalizeHistoryUrl(url);
-              const sanitizedState = sanitizeState(s);
-              return originalReplaceState.call(history, sanitizedState, unused, href);
+            history.replaceState = (s, unused, url) => {
+              const u = new URL(url ?? "", window.location.href);
+              const href = u.pathname + u.search + u.hash;
+              originalReplaceState.call(history, unused, href);
             };
 
             const originalPushState = history.pushState;
