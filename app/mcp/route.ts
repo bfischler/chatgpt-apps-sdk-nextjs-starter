@@ -39,7 +39,7 @@ const handler = createMcpHandler(async (server) => {
     invoked: "Content loaded",
     html: html,
     description: "Displays the homepage content",
-    widgetDomain: "https://nextjs.org/docs",
+    widgetDomain: "https://app.clay.com",
   };
   server.registerResource(
     "content-widget",
@@ -76,7 +76,9 @@ const handler = createMcpHandler(async (server) => {
       description:
         "Fetch and display the homepage content with the name of the user",
       inputSchema: {
-        name: z.string().describe("The name of the user to display on the homepage"),
+        name: z
+          .string()
+          .describe("The name of the user to display on the homepage"),
       },
       _meta: widgetMeta(contentWidget),
     },
