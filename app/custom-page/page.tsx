@@ -2,8 +2,12 @@
 
 import Link from "next/link";
 import { useWidgetState } from "../hooks";
+import { usePathname } from "next/navigation";
+import { useEffect } from "react";
 
 export default function HomePage() {
+  const pathname = usePathname();
+
   const [widgetState, setWidgetState] = useWidgetState<{
     displayName?: string;
   }>();
@@ -12,11 +16,10 @@ export default function HomePage() {
     setWidgetState((prev) => ({ ...prev, displayName: "Second page state" }));
   };
 
-  if (typeof window !== "undefined") {
-    console.log("BRETT pathname", window.location.pathname);
-  } else {
-    console.log("BRETT window undefined");
-  }
+  useEffect(() => {
+    console.log("BRETT pathname", pathname);
+    console.log("BRETT window.location.pathname", window.location.pathname);
+  }, [pathname]);
 
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20">
