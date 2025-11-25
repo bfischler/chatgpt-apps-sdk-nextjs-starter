@@ -97,20 +97,35 @@ function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
             history.replaceState = (s, unused, url) => {
               const u = new URL(url ?? "", window.location.href);
               const href = u.pathname + u.search + u.hash;
-              originalReplaceState.call(history, unused, href);
+              originalReplaceState.call(history, s, unused, href);
             };
 
             const originalPushState = history.pushState;
-            history.pushState = function (s, unused, url) {
-              const href = normalizeHistoryUrl(url);
-              const sanitizedState = sanitizeState(s);
-              return originalPushState.call(
-                history,
-                sanitizedState,
-                unused,
-                href
-              );
+            history.pushState = (s, unused, url) => {
+              const u = new URL(url ?? "", window.location.href);
+              const href = u.pathname + u.search + u.hash;
+              console.log("BRETT pushState", s, unused, href);
+              originalPushState.call(history, s, unused, href);
             };
+
+            // const originalReplaceState = history.replaceState;
+            // history.replaceState = (s, unused, url) => {
+            //   const u = new URL(url ?? "", window.location.href);
+            //   const href = u.pathname + u.search + u.hash;
+            //   originalReplaceState.call(history, unused, href);
+            // };
+
+            // const originalPushState = history.pushState;
+            // history.pushState = function (s, unused, url) {
+            //   const href = normalizeHistoryUrl(url);
+            //   const sanitizedState = sanitizeState(s);
+            //   return originalPushState.call(
+            //     history,
+            //     sanitizedState,
+            //     unused,
+            //     href
+            //   );
+            // };
 
             const appOrigin = new URL(baseUrl).origin;
             const isInIframe = window.self !== window.top;
