@@ -66,19 +66,41 @@ function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
               attributeOldValue: true,
             });
 
+            // Normalize URL to same-origin relative path for pushState/replaceState
+            // This is needed because in ChatGPT iframes, the document origin differs from the app origin
+            const normalizeHistoryUrl = (url: string | URL | null | undefined) => {
+              if (!url) return url;
+              try {
+                const u = new URL(url, window.location.href);
+                // Return just the path portion to avoid cross-origin issues
+                return u.pathname + u.search + u.hash;
+              } catch {
+                return url;
+              }
+            };
+
+            // Sanitize state object to remove any "url" or "as" fields that might contain cross-origin URLs
+            // Next.js stores these in state and browsers may validate them
+            const sanitizeState = (s: unknown) => {
+              if (!s || typeof s !== 'object') return s;
+              const sanitized = { ...s } as Record<string, unknown>;
+              if ('url' in sanitized) sanitized.url = normalizeHistoryUrl(sanitized.url as string);
+              if ('as' in sanitized) sanitized.as = normalizeHistoryUrl(sanitized.as as string);
+              return sanitized;
+            };
+
             const originalReplaceState = history.replaceState;
-            history.replaceState = (s, unused, url) => {
-              const u = new URL(url ?? "", window.location.href);
-              const href = u.pathname + u.search + u.hash;
-              originalReplaceState.call(history, s, unused, href);
+            history.replaceState = function(s, unused, url) {
+              const href = normalizeHistoryUrl(url);
+              const sanitizedState = sanitizeState(s);
+              return originalReplaceState.call(history, sanitizedState, unused, href);
             };
 
             const originalPushState = history.pushState;
-            history.pushState = (s, unused, url) => {
-              console.log("BRETT pushState", s, unused, url);
-              const u = new URL(url ?? "", window.location.href);
-              const href = u.pathname + u.search + u.hash;
-              originalPushState.call(history, s, unused, href);
+            history.pushState = function(s, unused, url) {
+              const href = normalizeHistoryUrl(url);
+              const sanitizedState = sanitizeState(s);
+              return originalPushState.call(history, sanitizedState, unused, href);
             };
 
             const appOrigin = new URL(baseUrl).origin;
