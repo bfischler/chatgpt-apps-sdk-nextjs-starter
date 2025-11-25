@@ -10,6 +10,7 @@ import {
   useIsChatGptApp,
   useWidgetState,
 } from "./hooks";
+import { useRouter } from "next/navigation";
 
 export default function Home() {
   const toolOutput = useWidgetProps<{
@@ -20,6 +21,7 @@ export default function Home() {
   const displayMode = useDisplayMode();
   const requestDisplayMode = useRequestDisplayMode();
   const isChatGptApp = useIsChatGptApp();
+  const router = useRouter();
 
   const name = toolOutput?.result?.structuredContent?.name || toolOutput?.name;
 
@@ -116,13 +118,28 @@ export default function Home() {
         </ol>
 
         <div className="flex gap-4 items-center flex-col sm:flex-row">
+          <Link
+            className="rounded-full border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
+            prefetch={false}
+            href="/custom-page"
+          >
+            Visit another page - with href
+          </Link>
           <p
             className="rounded-full cursor-pointer border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
             onClick={() => {
               window.location.assign("/custom-page?hello=there");
             }}
           >
-            Visit another page
+            Visit another page - with window.location.assign
+          </p>
+          <p
+            className="rounded-full cursor-pointer border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
+            onClick={() => {
+              router.push("/custom-page");
+            }}
+          >
+            Visit another page - with router.push
           </p>
           <a
             href="https://vercel.com/templates/ai/chatgpt-app-with-next-js"
