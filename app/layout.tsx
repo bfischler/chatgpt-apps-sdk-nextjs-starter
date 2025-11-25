@@ -84,10 +84,12 @@ function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
             // Next.js stores these in state and browsers may validate them
             // @ts-ignore - This code is stringified and run in browser, not compiled by TS
             const sanitizeState = (s) => {
-              if (!s || typeof s !== 'object') return s;
+              if (!s || typeof s !== "object") return s;
               const sanitized = { ...s };
-              if ('url' in sanitized) sanitized.url = normalizeHistoryUrl(sanitized.url);
-              if ('as' in sanitized) sanitized.as = normalizeHistoryUrl(sanitized.as);
+              if ("url" in sanitized)
+                sanitized.url = normalizeHistoryUrl(sanitized.url);
+              if ("as" in sanitized)
+                sanitized.as = normalizeHistoryUrl(sanitized.as);
               return sanitized;
             };
 
@@ -99,10 +101,15 @@ function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
             };
 
             const originalPushState = history.pushState;
-            history.pushState = function(s, unused, url) {
+            history.pushState = function (s, unused, url) {
               const href = normalizeHistoryUrl(url);
               const sanitizedState = sanitizeState(s);
-              return originalPushState.call(history, sanitizedState, unused, href);
+              return originalPushState.call(
+                history,
+                sanitizedState,
+                unused,
+                href
+              );
             };
 
             const appOrigin = new URL(baseUrl).origin;
