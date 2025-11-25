@@ -128,7 +128,9 @@ export default function Home() {
           <p
             className="rounded-full cursor-pointer border border-solid border-transparent transition-colors flex items-center justify-center bg-foreground text-background gap-2 hover:bg-[#383838] dark:hover:bg-[#ccc] font-medium text-sm sm:text-base h-10 sm:h-12 px-4 sm:px-5 sm:w-auto"
             onClick={() => {
-              window.history.replaceState(null, "", "/custom-page?hello=there");
+              console.log("before", window.location.pathname);
+              window.history.pushState({}, "", "/custom-page");
+              console.log("after", window.location.pathname);
             }}
           >
             Visit another page - with window.location.assign
