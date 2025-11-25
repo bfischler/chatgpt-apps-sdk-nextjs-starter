@@ -17,19 +17,19 @@ export function useWidgetState<T extends UnknownObject>(
 /**
  * Hook to manage widget state that persists across widget lifecycles.
  * State is synchronized with the ChatGPT parent window and survives widget minimize/restore.
- * 
+ *
  * @param defaultState - Initial state value or function to compute it
  * @returns A tuple of [state, setState] similar to useState, with bidirectional sync to ChatGPT
- * 
+ *
  * @example
  * ```tsx
  * interface MyState {
  *   count: number;
  *   user: string;
  * }
- * 
+ *
  * const [state, setState] = useWidgetState<MyState>({ count: 0, user: "guest" });
- * 
+ *
  * const increment = () => {
  *   setState(prev => ({ ...prev, count: prev.count + 1 }));
  * };
@@ -39,6 +39,7 @@ export function useWidgetState<T extends UnknownObject>(
   defaultState?: T | (() => T | null) | null
 ): readonly [T | null, (state: SetStateAction<T | null>) => void] {
   const widgetStateFromWindow = useOpenAIGlobal("widgetState") as T;
+  console.log("BRETT widgetStateFromWindow", widgetStateFromWindow);
 
   const [widgetState, _setWidgetState] = useState<T | null>(() => {
     if (widgetStateFromWindow != null) {
@@ -46,27 +47,25 @@ export function useWidgetState<T extends UnknownObject>(
     }
     return typeof defaultState === "function"
       ? defaultState()
-      : defaultState ?? null;
+      : (defaultState ?? null);
   });
 
   useEffect(() => {
+    console.log("BRETT widgetStateFromWindow useEffect", widgetStateFromWindow);
     _setWidgetState(widgetStateFromWindow);
   }, [widgetStateFromWindow]);
 
-  const setWidgetState = useCallback(
-    (state: SetStateAction<T | null>) => {
-      _setWidgetState((prevState) => {
-        const newState = typeof state === "function" ? state(prevState) : state;
+  const setWidgetState = useCallback((state: SetStateAction<T | null>) => {
+    _setWidgetState((prevState) => {
+      const newState = typeof state === "function" ? state(prevState) : state;
 
-        if (newState != null && typeof window !== "undefined" && window.openai) {
-          window.openai.setWidgetState(newState);
-        }
+      if (newState != null && typeof window !== "undefined" && window.openai) {
+        window.openai.setWidgetState(newState);
+      }
 
-        return newState;
-      });
-    },
-    []
-  );
+      return newState;
+    });
+  }, []);
 
   return [widgetState, setWidgetState] as const;
 }
