@@ -12,6 +12,12 @@ export default function HomePage() {
     setWidgetState((prev) => ({ ...prev, displayName: "Second page state" }));
   };
 
+  if (typeof window !== "undefined") {
+    console.log("BRETT pathname", window.location.pathname);
+  } else {
+    console.log("BRETT window undefined");
+  }
+
   return (
     <div className="font-sans grid grid-rows-[20px_1fr_20px] items-center justify-items-center p-8 pb-20 gap-16 sm:p-20">
       <main className="flex flex-col gap-[32px] row-start-2 items-center sm:items-start">
