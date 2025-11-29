@@ -25,6 +25,7 @@ function widgetMeta(widget: ContentWidget) {
     "openai/toolInvocation/invoked": widget.invoked,
     "openai/widgetAccessible": false,
     "openai/resultCanProduceWidget": true,
+    "openai/widgetSessionId": "fixed-value",
   } as const;
 }
 
@@ -41,6 +42,7 @@ const handler = createMcpHandler(async (server) => {
     description: "Displays the homepage content",
     widgetDomain: "https://app.clay.com",
   };
+
   server.registerResource(
     "content-widget",
     contentWidget.templateUri,
@@ -79,6 +81,35 @@ const handler = createMcpHandler(async (server) => {
         name: z
           .string()
           .describe("The name of the user to display on the homepage"),
+      },
+      _meta: widgetMeta(contentWidget),
+    },
+    async ({ name }) => {
+      return {
+        content: [
+          {
+            type: "text",
+            text: name,
+          },
+        ],
+        structuredContent: {
+          name: name,
+          timestamp: new Date().toISOString(),
+        },
+        _meta: widgetMeta(contentWidget),
+      };
+    }
+  );
+
+  server.registerTool(
+    "refresh-content",
+    {
+      title: "refresh-content",
+      description: "Refresh the content in the widget with a new name",
+      inputSchema: {
+        name: z
+          .string()
+          .describe("The new name of the user to display on the homepage"),
       },
       _meta: widgetMeta(contentWidget),
     },

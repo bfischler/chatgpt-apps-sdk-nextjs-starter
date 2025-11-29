@@ -103,7 +103,10 @@ function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
                 // Parse the incoming URL (might be absolute Vercel URL or relative)
                 const incoming = new URL(url, window.location.href);
                 // Create new URL with current origin + incoming path
-                const rebased = new URL(incoming.pathname + incoming.search + incoming.hash, window.location.origin);
+                const rebased = new URL(
+                  incoming.pathname + incoming.search + incoming.hash,
+                  window.location.origin
+                );
                 return rebased.href;
               } catch {
                 return url;
@@ -119,7 +122,6 @@ function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
             const originalPushState = history.pushState;
             history.pushState = (s, unused, url) => {
               const href = rebaseUrlToCurrentOrigin(url);
-              console.log("BRETT pushState", s, unused, url, "->", href);
               originalPushState.call(history, s, unused, href);
             };
 
