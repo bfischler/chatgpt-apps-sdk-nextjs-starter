@@ -83,7 +83,7 @@ const handler = createMcpHandler(async (server) => {
           .describe("The name of the user to display on the homepage"),
       },
       annotations: {
-        readOnly: true,
+        readOnlyHint: true,
       },
       _meta: widgetMeta(contentWidget),
     },
@@ -129,7 +129,7 @@ const handler = createMcpHandler(async (server) => {
           timestamp: new Date().toISOString(),
         },
         annotations: {
-          readOnly: true,
+          readOnlyHint: true,
         },
         _meta: widgetMeta(contentWidget),
       };
