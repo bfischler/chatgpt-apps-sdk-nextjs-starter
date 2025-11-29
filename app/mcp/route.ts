@@ -82,6 +82,9 @@ const handler = createMcpHandler(async (server) => {
           .string()
           .describe("The name of the user to display on the homepage"),
       },
+      annotations: {
+        readOnly: true,
+      },
       _meta: widgetMeta(contentWidget),
     },
     async ({ name }) => {
@@ -124,6 +127,9 @@ const handler = createMcpHandler(async (server) => {
         structuredContent: {
           name: name,
           timestamp: new Date().toISOString(),
+        },
+        annotations: {
+          readOnly: true,
         },
         _meta: widgetMeta(contentWidget),
       };
