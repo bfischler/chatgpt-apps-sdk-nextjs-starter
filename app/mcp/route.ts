@@ -115,6 +115,9 @@ const handler = createMcpHandler(async (server) => {
           .describe("The new name of the user to display on the homepage"),
       },
       _meta: widgetMeta(contentWidget),
+      annotations: {
+        readOnlyHint: true,
+      },
     },
     async ({ name }) => {
       return {
