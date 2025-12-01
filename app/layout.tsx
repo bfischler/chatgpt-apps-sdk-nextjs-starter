@@ -96,11 +96,14 @@ function NextChatSDKBootstrap({ baseUrl }: { baseUrl: string }) {
             // Rebase a URL onto the current window.location.origin (the sandbox origin)
             // This takes the path/search/hash from the incoming URL and combines it
             // with the sandbox origin, so pushState/replaceState work correctly
-            // @ts-ignore - This code is stringified and run in browser, not compiled by TS
-            const rebaseUrlToCurrentOrigin = (url) => {
-              if (!url) return url;
+            const rebaseUrlToCurrentOrigin = (
+              url: string | URL | null | undefined
+            ) => {
+              if (!url) {
+                return url;
+              }
+
               try {
-                // Parse the incoming URL (might be absolute Vercel URL or relative)
                 const incoming = new URL(url, window.location.href);
                 // Create new URL with current origin + incoming path
                 const rebased = new URL(
