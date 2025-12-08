@@ -12,6 +12,7 @@ import {
   useCallTool,
 } from "./hooks";
 import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 
 export default function Home() {
   const toolOutput = useWidgetProps<{
@@ -41,7 +42,10 @@ export default function Home() {
     console.log("BRETT RESULT", result);
   };
 
-  console.log("BRETT FULL WINDOW OPENAI", window.openai);
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    console.log("BRETT FULL WINDOW OPENAI", window.openai);
+  }, []);
 
   return (
     <div
