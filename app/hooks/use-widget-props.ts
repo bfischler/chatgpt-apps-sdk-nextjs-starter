@@ -19,7 +19,6 @@ export function useWidgetProps<T extends Record<string, unknown>>(
   defaultState?: T | (() => T)
 ): T {
   const toolOutput = useOpenAIGlobal("toolOutput") as T;
-  console.log("BRETT TOOL OUTPUT", toolOutput);
 
   const fallback =
     typeof defaultState === "function"

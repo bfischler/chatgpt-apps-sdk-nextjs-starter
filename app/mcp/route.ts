@@ -25,7 +25,7 @@ function widgetMeta(widget: ContentWidget) {
     "openai/toolInvocation/invoked": widget.invoked,
     "openai/widgetAccessible": false,
     "openai/resultCanProduceWidget": true,
-    "openai/widgetSessionId": "fixed-value",
+    // "openai/widgetSessionId": "fixed-value",
   } as const;
 }
 
