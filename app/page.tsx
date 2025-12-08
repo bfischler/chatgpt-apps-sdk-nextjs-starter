@@ -9,6 +9,7 @@ import {
   useRequestDisplayMode,
   useIsChatGptApp,
   useWidgetState,
+  useCallTool,
 } from "./hooks";
 import { useRouter } from "next/navigation";
 
@@ -31,6 +32,13 @@ export default function Home() {
 
   const handleButton = () => {
     setWidgetState((prev) => ({ ...prev, displayName: "First page state" }));
+  };
+
+  const callTool = useCallTool();
+
+  const handleManualToolCall = async () => {
+    const result = await callTool("show_content", { name: "Manual tool call" });
+    console.log("BRETT RESULT", result);
   };
 
   return (
@@ -147,6 +155,12 @@ export default function Home() {
           Update display name below with widgetState
         </button>
         <p>Display Name: {widgetState?.displayName ?? "<unset>"}</p>
+        <button
+          className="text-blue-500 underline cursor-pointer"
+          onClick={handleManualToolCall}
+        >
+          Manual tool call
+        </button>
       </main>
     </div>
   );
